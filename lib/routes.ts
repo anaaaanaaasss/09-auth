@@ -3,4 +3,5 @@ export const enum Routes {
 	Notes = "/notes/filter/All",
 	NoteDetails = "/notes/",
 	NotesFilter = "/notes/filter/",
+	SignUp = "/sign-up",
 }

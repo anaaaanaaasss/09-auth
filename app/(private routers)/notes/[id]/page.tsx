@@ -3,7 +3,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from '@tanstack/react-query';
-import { fetchNoteById } from '@/lib/api';
+import { fetchNoteById } from '@/app/server/serverApi';
 import NoteDetailsClient from './NoteDetails.client';
 import type { Metadata } from 'next';
 
@@ -15,12 +15,19 @@ export async function generateMetadata({ params }: NoteDetailsProps): Promise<Me
   const { id } = await params;
   const note = await fetchNoteById(id);
 
+  if (!note) {
+    return {
+      title: "Note not found | NoteHub",
+      description: "This note does not exist",
+    };
+  }
+
   return {
-    title: `${note.title} | NoteHub`,
-    description: note.content.slice(0, 100),
+    title: `${note!.title} | NoteHub`,
+    description: note!.content.slice(0, 100),
     openGraph: {
-      title: `${note.title} | NoteHub`,
-      description: note.content.slice(0, 100),
+      title: `${note!.title} | NoteHub`,
+      description: note!.content.slice(0, 100),
       url: `https://08-zustand-pi-three.vercel.app/notes/${id}`,
       images: ['https://ac.goit.global/fullstack/react/notehub-og-meta.jpg'],
     },

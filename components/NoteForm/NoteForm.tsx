@@ -2,7 +2,7 @@
 
 import css from './NoteForm.module.css';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createNote } from '@/lib/api';
+import { createNote } from '@/lib/api/clientApi';
 import { Loading } from 'notiflix';
 import toast from 'react-hot-toast';
 import { useNoteStore } from '@/lib/store/noteStore';
@@ -25,7 +25,7 @@ export default function NoteForm({
 
   const noteCreation = useMutation({
     mutationFn: async ({ title, content, tag }: typeof draft) => {
-      const data = await createNote(title, content, tag);
+      const data = await createNote({ title, content, tag });
       return data;
     },
     onSuccess: (_, variables) => {

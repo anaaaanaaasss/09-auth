@@ -2,10 +2,11 @@ import Link from 'next/link';
 import css from './Header.module.css';
 import { Routes } from '@/lib/routes';
 import TagsMenu from '../TagsMenu/TagsMenu';
-import { getCategories } from '@/lib/api';
+import { getCategories } from '@/app/server/serverApi';
+import AuthNavigation from '../AuthNavigation/AuthNavigation';
 
 const Header = async () => {
-  const categories = await getCategories();
+  const categories = await getCategories() as ('All' | 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping')[];
 
   return (
     <header className={css.header}>
@@ -20,6 +21,7 @@ const Header = async () => {
           <li>
             <TagsMenu categories={categories} />
           </li>
+          <AuthNavigation />
         </ul>
       </nav>
     </header>

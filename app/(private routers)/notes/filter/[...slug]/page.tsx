@@ -1,8 +1,9 @@
-import type { Tags } from "@/lib/api"
-import { fetchNotes } from "@/lib/api";
+import { getNotes } from "@/app/server/serverApi";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query"
 import NotesClient from "./Notes.client"
 import { Metadata } from "next"
+
+type Tags = "All" | "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
 
 type Props = {
 	params: Promise<{ slug: string[] }>
@@ -38,7 +39,7 @@ const NotesByCategory = async ({ params }: Props) => {
 
 	await queryClient.prefetchQuery({
 		queryKey: ["notesQuery", slug[0] || "All"],
-		queryFn: () => fetchNotes(undefined, 1, 12, slug[0] === "All" ? undefined : slug[0] as Exclude<Tags, "All">),
+		queryFn: () => getNotes({ page: 1, perPage: 12, tag: slug[0] === "All" ? undefined : slug[0] as Exclude<Tags, "All"> }),
 	})
 
 	return (

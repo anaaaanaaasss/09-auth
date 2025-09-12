@@ -1,10 +1,11 @@
 'use client';
 
+type Tags = "All" | "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
+
 import NoteList from '@/components/NoteList/NoteList';
 import Pagination from '@/components/Pagination/Pagination';
 import SearchBox from '@/components/SearchBox/SearchBox';
-import { fetchNotes } from '@/lib/api';
-import type { Tags } from '@/lib/api';
+import { fetchNotes } from '@/lib/api/clientApi';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -28,7 +29,7 @@ const NotesClient = ({ category }: NotesClientProps) => {
     error,
   } = useQuery({
     queryKey: ['notes', { search: debouncedQuery, page, category: normalizedCategory }],
-    queryFn: () => fetchNotes(debouncedQuery, page, undefined, normalizedCategory),
+    queryFn: () => fetchNotes({ search: debouncedQuery, page, perPage: undefined, tag: normalizedCategory }),
     refetchOnMount: false,
     placeholderData: keepPreviousData,
   });
