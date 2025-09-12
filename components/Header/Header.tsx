@@ -2,7 +2,7 @@ import Link from 'next/link';
 import css from './Header.module.css';
 import { Routes } from '@/lib/routes';
 import TagsMenu from '../TagsMenu/TagsMenu';
-import { getCategories } from '@/app/server/serverApi';
+import { getCategories } from '@/lib/api/serverApi';
 import AuthNavigation from '../AuthNavigation/AuthNavigation';
 
 const Header = async () => {

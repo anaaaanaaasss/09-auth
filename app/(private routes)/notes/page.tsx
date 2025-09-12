@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams, useRouter } from 'next/navigation';
 import NoteList from '@/components/NoteList/NoteList';
-import { getNotes } from '@/app/server/serverApi';
+import { getNotes } from '@/lib/api/serverApi';
 import SearchBox from '@/components/SearchBox/SearchBox';
 import Pagination from '@/components/Pagination/Pagination';
 
