@@ -1,35 +1,26 @@
 'use client';
 
+import { useEffect } from 'react';
 import css from './NoteForm.module.css';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createNote } from '@/lib/api/clientApi';
-import { Loading } from 'notiflix';
-import toast from 'react-hot-toast';
 import { useNoteStore } from '@/lib/store/noteStore';
-import { useRouter } from 'next/navigation';
 
-export default function NoteForm() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const { draft, setDraft, clearDraft } = useNoteStore();
+interface NoteFormProps {
+  categories: string[];
+  onSubmit: (data: { title: string; content: string; tag: string }) => void;
+  onCancel: () => void;
+  defaultValues: {
+    title: string;
+    content: string;
+    tag: string;
+  };
+}
 
-  const noteCreation = useMutation({
-    mutationFn: async ({ title, content, tag }: typeof draft) => {
-      const data = await createNote({ title, content, tag });
-      return data;
-    },
-    onSuccess: () => {
-      Loading.remove();
-      toast.success('Note has been successfully created!');
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-      clearDraft();
-      router.push('/notes');
-    },
-    onError: () => {
-      Loading.remove();
-      toast.error('Error occurred while creating note!');
-    },
-  });
+export default function NoteForm({ categories, onSubmit, onCancel, defaultValues }: NoteFormProps) {
+  const { draft, setDraft } = useNoteStore();
+
+  useEffect(() => {
+    setDraft(defaultValues);
+  }, [defaultValues, setDraft]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setDraft({ ...draft, [e.target.name]: e.target.value });
@@ -37,8 +28,7 @@ export default function NoteForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    Loading.hourglass();
-    noteCreation.mutate(draft);
+    onSubmit(draft);
   };
 
   return (
@@ -76,7 +66,7 @@ export default function NoteForm() {
           value={draft.tag}
           onChange={handleChange}
         >
-          {['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'].map((tag) => (
+          {categories.map((tag) => (
             <option key={tag} value={tag}>
               {tag}
             </option>
@@ -85,7 +75,7 @@ export default function NoteForm() {
       </div>
 
       <div className={css.actions}>
-        <button type="button" className={css.cancelButton} onClick={() => router.back()}>
+        <button type="button" className={css.cancelButton} onClick={onCancel}>
           Cancel
         </button>
         <button type="submit" className={css.submitButton}>

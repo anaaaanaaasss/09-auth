@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import NoteFormPage from '@/components/NoteFormPage/NoteFormPage';
+import NoteForm from '@/components/NoteForm/NoteForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +25,11 @@ export const metadata: Metadata = {
 
 export default function CreateNotePage() {
   return (
-    <NoteFormPage />
+    <NoteForm
+      categories={['Work', 'Personal', 'Meeting', 'Shopping', 'Todo']}
+      onSubmit={() => {}}
+      onCancel={() => {}}
+      defaultValues={{ title: '', content: '', tag: '' }}
+    />
   );
 }
