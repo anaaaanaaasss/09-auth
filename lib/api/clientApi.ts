@@ -8,13 +8,9 @@ export async function createNote(note: { title: string; content: string; tag?: s
   return data;
 }
 
-export const login = async (body: { email: string; password: string }): Promise<User> => {
-  const { data } = await api.post('/auth/login', body);
-  return data;
-};
 
 export const logout = async (): Promise<void> => {
-  await api.post('/auth/logout');
+  await api.post('/auth/logout', {}, { withCredentials: true });
 };
 
 export const loginUser = async (credentials: { email: string; password: string }): Promise<User> => {
@@ -76,6 +72,17 @@ export async function updateUser(data: { username: string }): Promise<User> {
   const res = await api.patch<User>('/users/me', data, { withCredentials: true });
   return res.data;
 }
-export async function deleteNote(id: string): Promise<void> {
-  await api.delete(`/notes/${id}`, { withCredentials: true });
+export async function deleteNote(id: string): Promise<Note> {
+  const { data } = await api.delete(`/notes/${id}`, { withCredentials: true });
+  return data;
+}
+
+export async function fetchNoteById(id: string): Promise<Note> {
+  const { data } = await api.get(`/notes/${id}`, { withCredentials: true });
+  return data;
+}
+
+export async function getCurrentUser(): Promise<User> {
+  const { data } = await api.get('/users/me', { withCredentials: true });
+  return data;
 }

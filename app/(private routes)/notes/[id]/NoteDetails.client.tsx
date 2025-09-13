@@ -1,18 +1,19 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { fetchNoteById } from '@/lib/api/serverApi';
+import { fetchNoteById } from '@/lib/api/clientApi';
 import css from './NoteDetails.module.css';
-import { useRouter } from 'next/router';
+import { Note } from '@/types/note';
 
 const NoteDetailsClient = () => {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams();
+  const id = typeof params.id === 'string' ? params.id : '';
   const {
     data: note,
     isLoading,
     error,
-  } = useQuery({
+  } = useQuery<Note>({
     queryKey: ['note', id],
     queryFn: () => fetchNoteById(id),
     refetchOnMount: false,
@@ -22,9 +23,9 @@ const NoteDetailsClient = () => {
   if (isLoading) return <p>Loading, please wait...</p>;
   if (error || !note) return <p>Something went wrong.</p>;
 
-const handleBack = () => {
-		router.back()
-	}
+  const handleBack = () => {
+    router.back()
+  }
 
 
   return (

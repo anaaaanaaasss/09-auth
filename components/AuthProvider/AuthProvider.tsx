@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { checkSession } from '@/lib/api/clientApi';
+import { checkSession, getCurrentUser } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -15,8 +15,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     async function fetchSession() {
       try {
-        const user = await checkSession();
-        if (user) {
+        const sessionValid = await checkSession();
+        if (sessionValid) {
+          const user = await getCurrentUser();
           setUser(user);
         } else if (pathname.startsWith('/profile') || pathname.startsWith('/notes')) {
           clearIsAuthenticated();

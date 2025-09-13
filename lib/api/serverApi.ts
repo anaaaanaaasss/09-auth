@@ -2,20 +2,16 @@
 import { cookies } from 'next/headers';
 import { User } from '@/types/user';
 import { Note } from '@/types/note';
+import { api } from '@/lib/axios';
 
 export const fetchNoteById = async (id: string): Promise<Note | null> => {
   try {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map((c: { name: string; value: string }) => `${c.name}=${c.value}`).join('; ');
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notes/${id}`, {
-      method: 'GET',
-      headers: {
-        Cookie: cookieHeader,
-      },
-      cache: 'no-store',
+    const response = await api.get(`/notes/${id}`, {
+      headers: { Cookie: cookieHeader },
     });
-    if (!response.ok) return null;
-    return await response.json();
+    return response.data;
   } catch {
     return null;
   }
@@ -25,17 +21,13 @@ export const getSession = async (): Promise<User | null> => {
   try {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map((c: { name: string; value: string }) => `${c.name}=${c.value}`).join('; ');
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/session`, {
-      method: 'GET',
-      headers: {
-        Cookie: cookieHeader,
-      },
-      cache: 'no-store',
+    const response = await api.get('/auth/session', {
+      headers: { Cookie: cookieHeader },
     });
 
-    if (!response.ok) return null;
+    if (!response.status || response.status < 200 || response.status >= 300) return null;
 
-    return await response.json();
+    return response.data;
   } catch {
     return null;
   }
@@ -45,17 +37,13 @@ export const getProfile = async (): Promise<User | null> => {
   try {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map((c: { name: string; value: string }) => `${c.name}=${c.value}`).join('; ');
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me`, {
-      method: 'GET',
-      headers: {
-        Cookie: cookieHeader,
-      },
-      cache: 'no-store',
+    const response = await api.get('/users/me', {
+      headers: { Cookie: cookieHeader },
     });
 
-    if (!response.ok) return null;
+    if (!response.status || response.status < 200 || response.status >= 300) return null;
 
-    return await response.json();
+    return response.data;
   } catch {
     return null;
   }
@@ -79,15 +67,11 @@ export const getCategories = async (): Promise<string[]> => {
 export const getTags = async (): Promise<string[]> => {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.getAll().map((c: { name: string; value: string }) => `${c.name}=${c.value}`).join('; ');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notes`, {
-    method: 'GET',
-    headers: {
-      Cookie: cookieHeader,
-    },
-    cache: 'no-store',
+  const response = await api.get('/notes', {
+    headers: { Cookie: cookieHeader },
   });
 
-  if (!response.ok) {
+  if (!response.status || response.status < 200 || response.status >= 300) {
     return [];
   }
 
@@ -95,7 +79,7 @@ export const getTags = async (): Promise<string[]> => {
     tag: string;
   }
 
-  const { notes } = (await response.json()) as { notes: NoteTag[] };
+  const { notes } = response.data as { notes: NoteTag[] };
   const tags = Array.from(new Set(notes.map((note: NoteTag) => note.tag)));
   return tags;
 };
@@ -111,28 +95,17 @@ export const getNotes = async (params?: {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map((c: { name: string; value: string }) => `${c.name}=${c.value}`).join('; ');
 
-    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/notes`);
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
-          url.searchParams.append(key, String(value));
-        }
-      });
-    }
-
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        Cookie: cookieHeader,
-      },
-      cache: 'no-store',
+    const url = '/notes';
+    const response = await api.get(url, {
+      headers: { Cookie: cookieHeader },
+      params,
     });
 
-    if (!response.ok) {
+    if (!response.status || response.status < 200 || response.status >= 300) {
       return { notes: [], totalPages: 0 };
     }
 
-    return await response.json();
+    return response.data;
   } catch {
     return { notes: [], totalPages: 0 };
   }
