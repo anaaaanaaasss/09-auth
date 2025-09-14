@@ -3,11 +3,12 @@
 import { useEffect } from 'react';
 import css from './NoteForm.module.css';
 import { useNoteStore } from '@/lib/store/noteStore';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createNote } from '@/lib/api/clientApi';
+import { useRouter } from 'next/navigation';
 
 interface NoteFormProps {
   categories: string[];
-  onSubmit: (data: { title: string; content: string; tag: string }) => void;
-  onCancel: () => void;
   defaultValues: {
     title: string;
     content: string;
@@ -15,8 +16,19 @@ interface NoteFormProps {
   };
 }
 
-export default function NoteForm({ categories, onSubmit, onCancel, defaultValues }: NoteFormProps) {
+export default function NoteForm({ categories, defaultValues }: NoteFormProps) {
   const { draft, setDraft } = useNoteStore();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const { mutate } = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+      setDraft({ title: '', content: '', tag: '' });
+      router.push('/notes');
+    },
+  });
 
   useEffect(() => {
     setDraft(defaultValues);
@@ -28,7 +40,11 @@ export default function NoteForm({ categories, onSubmit, onCancel, defaultValues
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(draft);
+    mutate(draft);
+  };
+
+  const handleCancel = () => {
+    router.back();
   };
 
   return (
@@ -75,7 +91,7 @@ export default function NoteForm({ categories, onSubmit, onCancel, defaultValues
       </div>
 
       <div className={css.actions}>
-        <button type="button" className={css.cancelButton} onClick={onCancel}>
+        <button type="button" className={css.cancelButton} onClick={handleCancel}>
           Cancel
         </button>
         <button type="submit" className={css.submitButton}>

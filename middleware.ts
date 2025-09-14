@@ -1,22 +1,26 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import type { User } from '@/types/user';
 import { getSession } from '@/lib/api/serverApi';
+import { cookies } from 'next/headers';
+import type { AxiosResponse } from 'axios';
 
 const protectedRoutes = ['/notes', '/profile'];
 const publicRoutes = ['/sign-in', '/sign-up'];
 
 export async function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get('accessToken');
-  const refreshToken = request.cookies.get('refreshToken');
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get('accessToken')?.value;
+  const refreshToken = cookieStore.get('refreshToken')?.value;
 
   const { pathname } = request.nextUrl;
 
   let isAuth = !!accessToken;
 
+  let user: AxiosResponse | null = null;
+
   if (!isAuth && refreshToken) {
     try {
-      const user: User | null = await getSession();
+      user = await getSession();
       if (user) {
         isAuth = true;
       }
@@ -36,7 +40,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  if (user?.data?.accessToken && user.data.refreshToken) {
+    response.cookies.set('accessToken', user.data.accessToken);
+    response.cookies.set('refreshToken', user.data.refreshToken);
+  }
+  return response;
 }
 
 export const config = {

@@ -25,11 +25,9 @@ export const metadata: Metadata = {
 
 export default function CreateNotePage() {
   return (
-    <NoteForm
-      categories={['Work', 'Personal', 'Meeting', 'Shopping', 'Todo']}
-      onSubmit={() => {}}
-      onCancel={() => {}}
-      defaultValues={{ title: '', content: '', tag: '' }}
-    />
+   <NoteForm
+  categories={['Work', 'Personal', 'Meeting', 'Shopping', 'Todo']}
+  defaultValues={{ title: '', content: '', tag: '' }}
+/>
   );
 }

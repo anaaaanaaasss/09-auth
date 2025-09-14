@@ -12,12 +12,17 @@ export const fetchNoteById = async (id: string): Promise<Note | null> => {
       headers: { Cookie: cookieHeader },
     });
     return response.data;
-  } catch {
-    return null;
+  } catch (error: unknown) {
+    if ((error as { response?: { status?: number } }).response?.status === 404) {
+      return null;
+    }
+    throw error;
   }
 };
 
-export const getSession = async (): Promise<User | null> => {
+import { AxiosResponse } from 'axios';
+
+export const getSession = async (): Promise<AxiosResponse<User> | null> => {
   try {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map((c: { name: string; value: string }) => `${c.name}=${c.value}`).join('; ');
@@ -27,13 +32,13 @@ export const getSession = async (): Promise<User | null> => {
 
     if (!response.status || response.status < 200 || response.status >= 300) return null;
 
-    return response.data;
+    return response;
   } catch {
     return null;
   }
 };
 
-export const getProfile = async (): Promise<User | null> => {
+export const getProfile = async (): Promise<AxiosResponse<User> | null> => {
   try {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map((c: { name: string; value: string }) => `${c.name}=${c.value}`).join('; ');
@@ -43,7 +48,7 @@ export const getProfile = async (): Promise<User | null> => {
 
     if (!response.status || response.status < 200 || response.status >= 300) return null;
 
-    return response.data;
+    return response;
   } catch {
     return null;
   }

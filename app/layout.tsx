@@ -49,16 +49,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable}`}>
-        <AuthProvider>
-          <TanStackProvider>
+        <TanStackProvider>
+          <AuthProvider>
             <Header />
             <main>
               {children}
               {modal}
             </main>
             <Footer />
-          </TanStackProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </TanStackProvider>
       </body>
     </html>
   );

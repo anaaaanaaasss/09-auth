@@ -2,13 +2,15 @@ import css from './ProfilePage.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getProfile } from '@/lib/api/serverApi';
+import type { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Profile',
 };
 
 export default async function ProfilePage() {
-  const user = await getProfile();
+  const response = await getProfile();
+  const user = response?.data;
 
   return (
     <main className={css.mainContent}>
